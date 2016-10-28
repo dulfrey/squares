@@ -34,7 +34,7 @@ public class SquaresMain  {
     agentAd[7] = new Agent( new SquareHardAgentProgram(Squares.BLACK));
 */    
     Agent w_agent =  new Agent( new DummySquaresAgentProgram(Squares.WHITE));
-    Agent b_agent =  new Agent( new DummySquaresAgentProgram(Squares.BLACK));
+    Agent b_agent =  new Agent( new MySquaresAgent(Squares.BLACK));
     SquaresMainFrame frame = new SquaresMainFrame( w_agent, b_agent );
     frame.setVisible(true);
   }
