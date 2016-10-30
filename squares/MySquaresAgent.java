@@ -18,7 +18,7 @@ public class MySquaresAgent implements AgentProgram {
 
     
     protected String myColor;
-    protected Clock myClock;
+    protected String myClock;
     protected Clock oponentClock;
     
     
@@ -37,7 +37,13 @@ public class MySquaresAgent implements AgentProgram {
         
         //si es mi turno
         if( p.getAttribute(Squares.TURN).equals(myColor) ){
-            
+            //si mi oponente es negro 
+            if ( getOponentColor().equals( Squares.BLACK)) {
+                myClock = (String) p.getAttribute( Squares.WHITE + "_" + Squares.TIME);
+            }else{
+                myClock = (String) p.getAttribute( Squares.BLACK + "_" + Squares.TIME);
+            }
+                //System.out.println( myClock + "+" );
 //            int size = Integer.parseInt((String)p.getAttribute(Squares.SIZE));
 //            int i = 0;
 //            int j = 0;
@@ -62,7 +68,7 @@ public class MySquaresAgent implements AgentProgram {
     }
     
     
-    //devuelve el myColor del oponente
+    //devuelve el Color del oponente
     public String getOponentColor(){
         if ( this.myColor.equals( Squares.BLACK)) {
             return Squares.WHITE;
