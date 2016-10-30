@@ -19,7 +19,7 @@ public class MySquaresAgent implements AgentProgram {
     
     PriorityQueue<String> queue = new PriorityQueue<String>();
     protected String myColor;
-    protected Clock myClock;
+    protected String myClock;
     protected Clock oponentClock;
     
     
@@ -38,6 +38,7 @@ public class MySquaresAgent implements AgentProgram {
         
         //si es mi turno
         if( p.getAttribute(Squares.TURN).equals(myColor) ){
+<<<<<<< HEAD
             
             int size = Integer.parseInt((String)p.getAttribute(Squares.SIZE));
             int i = 0;
@@ -61,6 +62,32 @@ public class MySquaresAgent implements AgentProgram {
             }
             queue.add(i+":"+j);
             return new Action( i+":"+j+":"+v.get((int)(Math.random()*v.size())) );
+=======
+            //si mi oponente es negro 
+            if ( getOponentColor().equals( Squares.BLACK)) {
+                myClock = (String) p.getAttribute( Squares.WHITE + "_" + Squares.TIME);
+            }else{
+                myClock = (String) p.getAttribute( Squares.BLACK + "_" + Squares.TIME);
+            }
+                //System.out.println( myClock + "+" );
+//            int size = Integer.parseInt((String)p.getAttribute(Squares.SIZE));
+//            int i = 0;
+//            int j = 0;
+//            Vector<String> v = new Vector<String>();
+//            while(v.size()==0){
+//              i = (int)(size*Math.random());
+//              j = (int)(size*Math.random());
+//              if(((String)p.getAttribute(i+":"+j+":"+Squares.LEFT)).equals(Squares.FALSE))
+//                v.add(Squares.LEFT);
+//              if(((String)p.getAttribute(i+":"+j+":"+Squares.TOP)).equals(Squares.FALSE))
+//                v.add(Squares.TOP);
+//              if(((String)p.getAttribute(i+":"+j+":"+Squares.BOTTOM)).equals(Squares.FALSE))
+//                v.add(Squares.BOTTOM);
+//              if(((String)p.getAttribute(i+":"+j+":"+Squares.RIGHT)).equals(Squares.FALSE))
+//                v.add(Squares.RIGHT);
+//            }
+//            return new Action( i+":"+j+":"+v.get((int)(Math.random()*v.size())) );
+>>>>>>> e2a9dee0a1f97eb4f6fe33aa79da0dbf207074de
         }
         //System.out.println(queue.toString());
         System.out.println( p.getAttribute( Squares.WHITE + "_" + Squares.TIME));
@@ -68,7 +95,7 @@ public class MySquaresAgent implements AgentProgram {
     }
     
     
-    //devuelve el myColor del oponente
+    //devuelve el Color del oponente
     public String getOponentColor(){
         if ( this.myColor.equals( Squares.BLACK)) {
             return Squares.WHITE;
