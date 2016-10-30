@@ -9,14 +9,15 @@ import unalcol.agents.AgentProgram;
 import unalcol.agents.Percept;
 import unalcol.agents.examples.reversi.Clock;
 import unalcol.types.collection.vector.Vector;
+import java.util.PriorityQueue;
 
 /**
  *
  * @author dulfrey
  */
 public class MySquaresAgent implements AgentProgram {
-
     
+    PriorityQueue<String> queue = new PriorityQueue<String>();
     protected String myColor;
     protected Clock myClock;
     protected Clock oponentClock;
@@ -38,25 +39,30 @@ public class MySquaresAgent implements AgentProgram {
         //si es mi turno
         if( p.getAttribute(Squares.TURN).equals(myColor) ){
             
-//            int size = Integer.parseInt((String)p.getAttribute(Squares.SIZE));
-//            int i = 0;
-//            int j = 0;
-//            Vector<String> v = new Vector<String>();
-//            while(v.size()==0){
-//              i = (int)(size*Math.random());
-//              j = (int)(size*Math.random());
-//              if(((String)p.getAttribute(i+":"+j+":"+Squares.LEFT)).equals(Squares.FALSE))
-//                v.add(Squares.LEFT);
-//              if(((String)p.getAttribute(i+":"+j+":"+Squares.TOP)).equals(Squares.FALSE))
-//                v.add(Squares.TOP);
-//              if(((String)p.getAttribute(i+":"+j+":"+Squares.BOTTOM)).equals(Squares.FALSE))
-//                v.add(Squares.BOTTOM);
-//              if(((String)p.getAttribute(i+":"+j+":"+Squares.RIGHT)).equals(Squares.FALSE))
-//                v.add(Squares.RIGHT);
-//            }
-//            return new Action( i+":"+j+":"+v.get((int)(Math.random()*v.size())) );
+            int size = Integer.parseInt((String)p.getAttribute(Squares.SIZE));
+            int i = 0;
+            int j = 0;
+            Vector<String> v = new Vector<String>();
+              
+            while(v.size()==0){
+              
+              i = (int)(size*Math.random());
+              j = (int)(size*Math.random());
+              
+              if(((String)p.getAttribute(i+":"+j+":"+Squares.LEFT)).equals(Squares.FALSE))
+                v.add(Squares.LEFT);
+              if(((String)p.getAttribute(i+":"+j+":"+Squares.TOP)).equals(Squares.FALSE))
+                v.add(Squares.TOP);
+              if(((String)p.getAttribute(i+":"+j+":"+Squares.BOTTOM)).equals(Squares.FALSE))
+                v.add(Squares.BOTTOM);
+              if(((String)p.getAttribute(i+":"+j+":"+Squares.RIGHT)).equals(Squares.FALSE))
+                v.add(Squares.RIGHT);
+                //System.out.println(v);
+            }
+            queue.add(i+":"+j);
+            return new Action( i+":"+j+":"+v.get((int)(Math.random()*v.size())) );
         }
-        
+        //System.out.println(queue.toString());
         System.out.println( p.getAttribute( Squares.WHITE + "_" + Squares.TIME));
         return new Action(Squares.PASS);
     }
