@@ -40,22 +40,23 @@ public class MySquaresAgent implements AgentProgram {
     // mi tiempo y el de mi oponente
     @Override
     public Action compute( Percept p ) {
-        
+        if ( size == 0 ) {
+            size = Integer.parseInt( (String) p.getAttribute( Squares.SIZE ) );
+            queue = new PriorityQueue<>( size * size, new Cuadrito() );
+            initializeCuadritos();
+        }
         long time = (long) (200 * Math.random());
         try {
             Thread.sleep( time );
         } catch (Exception e) {
             System.out.println( "error en el thread de mi agente" );
         }
-        if ( size == 0 ) {
-            size = Integer.parseInt( (String) p.getAttribute( Squares.SIZE ) );
-            queue = new PriorityQueue<>( size * size, new Cuadrito() );
-            initializeCuadritos();
-        }
-        System.out.println( "cuadritos");
-        for ( int i = 0; i < size * size; i++ ) {
-                System.out.println( queue.poll());
-            }
+        updateSquares( p );
+
+//        System.out.println( "cuadritos");
+//        for ( int i = 0; i < size * size; i++ ) {
+//                System.out.println( queue.poll());
+//            }
         //si es mi turno
         if ( p.getAttribute( Squares.TURN ).equals( myColor ) ) {
             //hay un cuadro para llenar
@@ -63,9 +64,7 @@ public class MySquaresAgent implements AgentProgram {
                 return new Action( t.i + ":" + t.j + ":" + t.side );
             }
 
-            
             //marcar linea 
-
             int asize = Integer.parseInt( (String) p.getAttribute( Squares.SIZE ) );
             int i = 0;
             int j = 0;
@@ -116,14 +115,19 @@ public class MySquaresAgent implements AgentProgram {
 
     private boolean isSquareToFill( Percept p ) {
 
-        for ( int i = 0; i < size; i++ ) {
-            for ( int j = 0; j < size; j++ ) {
-                if ( numberOfLines( i, j, p ) == 3 ) {
-                    return true;
-                }
-            }
-
+        if ( queue.peek().v.size() == 3 ) {
+            Cuadrito c = queue.poll();
+            t = new Target( c.i, c.j, c.available() );
+           return true;
         }
+//        for ( int i = 0; i < size; i++ ) {
+//            for ( int j = 0; j < size; j++ ) {
+//                if ( numberOfLines( i, j, p ) == 3 ) {
+//                    return true;
+//                }
+//            }
+//
+//        }
 
         return true;
     }
@@ -161,7 +165,7 @@ public class MySquaresAgent implements AgentProgram {
     }
 
     private void initializeCuadritos() {
-        
+
         for ( int i = 0; i < size; i++ ) {
             for ( int j = 0; j < size; j++ ) {
                 Vector<String> v = new Vector<String>();
@@ -204,10 +208,45 @@ public class MySquaresAgent implements AgentProgram {
                 if ( j != size - 1 && j != 0 && i != 0 && i != size - 1 ) {
                     queue.add( new Cuadrito( i, j, v ) );
                 }
-               
+
             }
 
         }
+    }
+
+    private void updateSquares( Percept p ) {
+        PriorityQueue<Cuadrito> newQueue = new PriorityQueue<Cuadrito>();
+        for ( Iterator<Cuadrito> iterator = queue.iterator(); iterator.hasNext(); ) {
+            Cuadrito next = iterator.next();
+            Vector<String> v = new Vector<String>();
+            
+            if ( ((String) p.getAttribute( next.i + ":" + next.j + ":" + Squares.LEFT )).equals( Squares.TRUE ) ) {
+                v.add( Squares.LEFT );
+            }
+
+            if ( ((String) p.getAttribute( next.i + ":" + next.j + ":" + Squares.TOP )).equals( Squares.TRUE ) ) {
+                v.add( Squares.TOP );
+            }
+            if ( ((String) p.getAttribute( next.i + ":" + next.j + ":" + Squares.BOTTOM )).equals( Squares.TRUE ) ) {
+                v.add( Squares.BOTTOM );
+            }
+            if ( ((String) p.getAttribute( next.i + ":" + next.j + ":" + Squares.RIGHT )).equals( Squares.TRUE ) ) {
+                v.add( Squares.RIGHT );
+            }
+           // el cuadro está completo  
+            if ( v.size() == 4 ) {
+                queue.remove( next );
+            }else{
+                newQueue.add( new Cuadrito( next.i, next.j, v ) );
+            }
+            
+            if ( !next.equals( new Cuadrito( next.i, next.j, v ) ) ) {
+                   queue.remove( next );
+                   queue.add( new Cuadrito( next.i, next.j, v ) );
+            }
+        }
+       
+       
     }
 
     private static class Cuadrito implements Comparator<Cuadrito> {
@@ -215,7 +254,23 @@ public class MySquaresAgent implements AgentProgram {
         private int i;
         private int j;
         private Vector<String> v = new Vector<String>();
-
+        
+        public String available(){
+            if ( !v.contains( Squares.TOP)) {
+                return Squares.TOP;
+            }
+            if ( !v.contains( Squares.RIGHT)) {
+                return Squares.RIGHT;
+            }
+            if ( !v.contains( Squares.BOTTOM)) {
+                return Squares.BOTTOM;
+            }
+            if ( !v.contains( Squares.LEFT)) {
+                return Squares.LEFT;
+            }
+            return null;
+        }
+        
         public Cuadrito( int i, int j, Vector<String> values ) {
             this.i = i;
             this.j = j;
@@ -223,12 +278,12 @@ public class MySquaresAgent implements AgentProgram {
         }
 
         public String toString() {
-            String s = i+" "+j;
+            String s = i + " " + j;
             for ( Iterator<String> iterator = v.iterator(); iterator.hasNext(); ) {
                 String next = iterator.next();
-                s = s + next+" " ;
+                s = s + next + " ";
             }
-            
+
             return s;
         }
 
