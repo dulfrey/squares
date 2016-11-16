@@ -31,7 +31,7 @@ public class MySquaresAgent implements AgentProgram {
     protected int size;
     protected Target myTarget;
     protected ArrayList<Cuadrito> cuadritosArray;
-    
+
     public MySquaresAgent( String color ) {
         this.myColor = color;
         this.size = 0;
@@ -55,11 +55,12 @@ public class MySquaresAgent implements AgentProgram {
         } catch (Exception e) {
             System.out.println( "error en el thread de mi agente" );
         }
-        
-
+        updateSquares( p );
+        Action theAction  = new Action("0:0:"+Squares.BOTTOM);
         //si es mi turno
+        
         if ( p.getAttribute( Squares.TURN ).equals( myColor ) ) {
-            updateSquares( p );
+            
             //si mi oponente es negro 
 //            if ( getOponentColor().equals( Squares.BLACK ) ) {
 //                myClock = (String) p.getAttribute( Squares.WHITE + "_" + Squares.TIME );
@@ -72,28 +73,35 @@ public class MySquaresAgent implements AgentProgram {
 //                System.out.println(cuadritosArray.get( i ));
 //            }
             if ( isSquareToFill( p ) ) {
-                System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
+                System.out.println("para llenar:"+ myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
                 return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
             }
-            Cuadrito lastCuadrito = cuadritosArray.get( cuadritosArray.size() - 1 );
-
+            Cuadrito lastCuadrito = cuadritosArray.get( cuadritosArray.size() - 1 );    
+            
             switch (lastCuadrito.sides.size()) {
 
                 case 0:
-                    playLast( p, lastCuadrito );
+                    //System.out.println( "case 0" );
+                    theAction = playLast( p, lastCuadrito );
+                    
                     break;
                 case 1:
-                    playLast1( p, lastCuadrito );
+                    //System.out.println( "case 1" );
+                    theAction = playLast1( p, lastCuadrito );
                     break;
                 case 2:
-                    playLast2( p, lastCuadrito );
+                    System.out.println( "case 2" );
+                    theAction = playLast2( p, lastCuadrito );
                     break;
 
             }
+            return theAction;
+            
         }
-        //System.out.println(queue.toString());
-    
-        return new Action( Squares.PASS );
+      
+        System.out.println( "no es mi turno" + theAction );
+        return theAction;
+                
     }
 
     //devuelve el Color del oponente
@@ -248,24 +256,7 @@ public class MySquaresAgent implements AgentProgram {
         }
     }
 
-    private Action playLast( Percept p, Cuadrito lastCuadrito ) {
-        String side = "";
-        if ( lastCuadrito.i > 1 && lastCuadrito.i < size - 2 && lastCuadrito.j > 1 && lastCuadrito.j < size - 2 ) {
-            if ( lastCuadrito.availableRandomSide() != null ) {
-                side = lastCuadrito.availableRandomSide();
-   
-                buscarArriba(lastCuadrito,side,p );
-                buscarAbajo(lastCuadrito,side,p );
-                buscarDere(lastCuadrito,side,p );
-                buscarIzq(lastCuadrito,side,p );
-                
-                //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
-                return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
-            }
-        }
-        //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
-        return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
-    }
+
 
     private void buscarArriba( Cuadrito lastCuadrito, String side, Percept p ) {
         if ( side.equals( Squares.TOP ) ) {
@@ -298,68 +289,99 @@ public class MySquaresAgent implements AgentProgram {
             }
         }
     }
+    private Action playLast( Percept p, Cuadrito lastCuadrito ) {
+        String side = "";
+      
+            if ( lastCuadrito.availableRandomSide() != null ) {
+                side = lastCuadrito.availableRandomSide();
 
+                buscarArriba( lastCuadrito, side, p );
+                buscarAbajo( lastCuadrito, side, p );
+                buscarDere( lastCuadrito, side, p );
+                buscarIzq( lastCuadrito, side, p );
+
+                //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
+                return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
+            }
+       
+        //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
+        return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
+    }
+    
     private Action playLast1( Percept p, Cuadrito lastCuadrito ) {
 
         String side = "";
-        side = lastCuadrito.sides.get(0);
-        
-        if ( side.equals( Squares.TOP)) {
+        side = lastCuadrito.sides.get( 0 );
+        System.out.println( lastCuadrito +" ++ " + side);
+        if ( side.equals( Squares.TOP ) ) {
+            System.out.println( "top" );
             buscarDere( lastCuadrito, myColor, p );
-                    buscarIzq( lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
+            buscarIzq( lastCuadrito, myColor, p );
+            buscarAbajo( lastCuadrito, myColor, p );
         }
-        if ( side.equals( Squares.LEFT)) {
+        if ( side.equals( Squares.LEFT ) ) {
+            System.out.println( "left" );
             buscarDere( lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
+            buscarArriba( lastCuadrito, myColor, p );
+            buscarAbajo( lastCuadrito, myColor, p );
         }
-        if ( side.equals( Squares.RIGHT)) {
-            buscarIzq(lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
+        if ( side.equals( Squares.RIGHT ) ) {
+            System.out.println( "right" );
+            buscarIzq( lastCuadrito, myColor, p );
+            buscarArriba( lastCuadrito, myColor, p );
+            buscarAbajo( lastCuadrito, myColor, p );
         }
-        if ( side.equals( Squares.BOTTOM)) {
-            buscarIzq(lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarDere(lastCuadrito, myColor, p );
+        if ( side.equals( Squares.BOTTOM ) ) {
+            System.out.println( "bottom" );
+            buscarIzq( lastCuadrito, myColor, p );
+            buscarArriba( lastCuadrito, myColor, p );
+            buscarDere( lastCuadrito, myColor, p );
         }
-       
-       
 
-        
         //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
         return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
     }
 
     private Action playLast2( Percept p, Cuadrito lastCuadrito ) {
         String side = "";
-        side = lastCuadrito.sides.get(0);
-        side2 = lastCuadrito.sides.get( 0 );
-        if ( side.equals( Squares.TOP)) {
-            buscarDere( lastCuadrito, myColor, p );
-                    buscarIzq( lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
-        }
-        if ( side.equals( Squares.LEFT)) {
-            buscarDere( lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
-        }
-        if ( side.equals( Squares.RIGHT)) {
-            buscarIzq(lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarAbajo( lastCuadrito, myColor, p );
-        }
-        if ( side.equals( Squares.BOTTOM)) {
-            buscarIzq(lastCuadrito, myColor, p );
-                    buscarArriba(lastCuadrito, myColor, p );
-                    buscarDere(lastCuadrito, myColor, p );
-        }
-       
-       
-
+        String side2 = "";
+        side = lastCuadrito.sides.get( 0 );
+        side2 = lastCuadrito.sides.get( 1 );
         
+        if ( (side.equals( Squares.TOP) && side2.equals( Squares.LEFT) )|| (side2.equals( Squares.TOP) && side.equals( Squares.LEFT))) {
+            buscarDere( lastCuadrito, myColor, p );
+            buscarAbajo(lastCuadrito, myColor, p );
+        }
+        
+        if ( (side.equals( Squares.TOP) && side2.equals( Squares.RIGHT))|| (side2.equals( Squares.TOP) && side.equals( Squares.RIGHT)) ) {
+            buscarIzq(lastCuadrito, myColor, p );
+            buscarAbajo(lastCuadrito, myColor, p );
+        }
+        if ( (side.equals( Squares.TOP) && side2.equals( Squares.BOTTOM))|| (side2.equals( Squares.TOP) && side.equals( Squares.BOTTOM)) ) {
+            buscarDere( lastCuadrito, myColor, p );
+            buscarIzq(lastCuadrito, myColor, p );
+        }
+        
+        
+        /////////////
+        if ( (side.equals( Squares.LEFT) && side2.equals( Squares.BOTTOM))|| (side2.equals( Squares.LEFT) && side.equals( Squares.BOTTOM)) ) {
+            buscarDere( lastCuadrito, myColor, p );
+            buscarArriba(lastCuadrito, myColor, p );
+        }
+        if ( (side.equals( Squares.LEFT) && side2.equals( Squares.RIGHT))|| (side2.equals( Squares.LEFT) && side.equals( Squares.RIGHT)) ) {
+            buscarAbajo(lastCuadrito, myColor, p );
+            buscarArriba(lastCuadrito, myColor, p );
+        }
+        ////
+        if ( (side.equals( Squares.RIGHT) && side2.equals( Squares.BOTTOM))|| (side2.equals( Squares.RIGHT) && side.equals( Squares.BOTTOM)) ) {
+            buscarIzq(lastCuadrito, myColor, p );
+            buscarArriba(lastCuadrito, myColor, p );
+        }
+        
+        
+        ////////////
+      
+
         //System.out.println( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
         return new Action( myTarget.i + ":" + myTarget.j + ":" + myTarget.side );
     }
@@ -389,7 +411,7 @@ public class MySquaresAgent implements AgentProgram {
             }
             if ( avaliabbleSides.size() != 0 ) {
                 int c = (int) (avaliabbleSides.size() * Math.random());
-                System.out.println( c );
+                
                 return avaliabbleSides.get( c );
             }
             return null;
